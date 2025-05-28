@@ -95,6 +95,16 @@ def run_command(cmd, cwd=None, timeout=300):
         return False, str(e)
 
 
+def remote_exists(remote_name, cwd):
+    """检查远程名是否存在"""
+    success, output = run_command(["git", "remote"], cwd=cwd)
+    if not success:
+        # 无法获取远程列表，假设远程不存在
+        return False
+    remotes = output.strip().splitlines()
+    return remote_name in remotes
+
+
 def get_authenticated_url(repo_url):
     """
     如果配置了 GITHUB_USERNAME 和 GITHUB_TOKEN，则返回带 token 的 HTTPS URL，
@@ -140,8 +150,9 @@ def process_repo(repo_url):
             print(f"克隆失败：{error}")
             return False
 
-        # 移除旧的 origin
-        run_command(["git", "remote", "remove", "origin"], cwd=temp_dir)
+        # 移除旧的 origin（先检查是否存在）
+        if remote_exists("origin", cwd=temp_dir):
+            run_command(["git", "remote", "remove", "origin"], cwd=temp_dir)
 
         # 添加远程 origin，使用带 token 的 HTTPS URL
         auth_url = get_authenticated_url(repo_url)
@@ -177,7 +188,9 @@ if current_author not in skip_authors:
             return False
 
         # filter-repo 会删除远程，重新添加带 token 的 remote
-        run_command(["git", "remote", "remove", "origin"], cwd=temp_dir)
+        if remote_exists("origin", cwd=temp_dir):
+            run_command(["git", "remote", "remove", "origin"], cwd=temp_dir)
+
         success, error = run_command(["git", "remote", "add", "origin", auth_url], cwd=temp_dir)
         if not success:
             print(f"重新添加远程失败: {error}")
@@ -185,7 +198,6 @@ if current_author not in skip_authors:
 
         print("正在推送修改到远程仓库...")
 
-        # ==== 修改点：不使用 --mirror 推送，避免推送 refs/pull/* 导致拒绝推送 ====
         # 推送所有分支
         success, error = run_command(["git", "push", "--force", "origin", "refs/heads/*:refs/heads/*"], cwd=temp_dir, timeout=600)
         if not success:
