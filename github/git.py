@@ -58,7 +58,7 @@ def check_filter_repo_available():
         pass
     
     print("错误：未找到git-filter-repo命令")
-    print("请在宿主机安装此工具：sudo apt install git-filter-repo")
+    print("请在宿主机安装此工具：apt install git-filter-repo")
     return False
 
 def run_command(cmd, cwd=None, timeout=300):
