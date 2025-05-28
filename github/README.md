@@ -6,3 +6,9 @@ apt install git-filter-repo git -y
 ```
 
 `repos.txt`文件中放入github仓库地址，一行一个。
+
+
+- 查看历史提交信息，提交地址结尾添加
+```
+.patch
+```
