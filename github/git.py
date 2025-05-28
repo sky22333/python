@@ -12,7 +12,7 @@ import tempfile
 NEW_NAME = "NewName"
 NEW_EMAIL = "newemail@example.com"
 
-# GitHub 认证用户名和 Token变量
+# GitHub用户名和 Token变量
 GITHUB_USERNAME = "sky22333"
 GITHUB_TOKEN = "xxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
