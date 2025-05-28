@@ -18,7 +18,6 @@ GITHUB_TOKEN = "xxxxxxxxxxxxxxxxxxxxxxxxxxx"
 
 # 跳过处理的用户名列表（这些用户名的提交将保持不变）
 SKIP_AUTHORS = [
-    "sky22333",
     "github-actions[bot]",
     # 在此添加更多需要跳过的用户名
 ]
