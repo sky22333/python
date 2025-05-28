@@ -1,5 +1,3 @@
-# 批量下载邮箱中收件箱的pdf文件，只获取未读邮箱
-
 import imaplib
 import email
 from email.header import decode_header
@@ -16,7 +14,7 @@ import base64
 from email import policy
 from email.parser import BytesParser
 
-# 配置区
+# IMAP配置区
 EMAIL = '8888888@qq.com'  # 替换为你的QQ邮箱
 PASSWORD = 'xxxxxxxxxx'  # 替换为你的授权码
 IMAP_SERVER = 'imap.qq.com'
