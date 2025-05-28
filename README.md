@@ -1,5 +1,5 @@
-### python
-- 自用python工具合集
+### 自用python工具合集
+
 
 ### Linux一键安装python脚本
 ```
