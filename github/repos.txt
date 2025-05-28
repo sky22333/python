@@ -1,1 +1,2 @@
 https://github.com/user/python.git
+https://github.com/user/shell.git
