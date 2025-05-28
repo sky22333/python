@@ -1,7 +1,10 @@
 ### 自用python工具合集
 
 
-### Linux一键安装python脚本
+### Docker启用python容器
 ```
-bash <(curl -sSL https://raw.githubusercontent.com/sky22333/python/main/python.sh)
+docker run -d --name py \
+  -v /home:/home \
+  python:3.12-slim \
+  tail -f /dev/null
 ```
