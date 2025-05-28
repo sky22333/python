@@ -185,9 +185,18 @@ if current_author not in skip_authors:
             return False
 
         print("正在推送修改到远程仓库...")
-        success, error = run_command(["git", "push", "--mirror", "--force"], cwd=temp_dir, timeout=600)
+
+        # ==== 修改点：不使用 --mirror 推送，避免推送 refs/pull/* 导致拒绝推送 ====
+        # 推送所有分支
+        success, error = run_command(["git", "push", "--force", "origin", "refs/heads/*:refs/heads/*"], cwd=temp_dir, timeout=600)
         if not success:
-            print(f"推送失败：{error}")
+            print(f"推送分支失败：{error}")
+            return False
+
+        # 推送所有标签
+        success, error = run_command(["git", "push", "--force", "origin", "refs/tags/*:refs/tags/*"], cwd=temp_dir, timeout=600)
+        if not success:
+            print(f"推送标签失败：{error}")
             return False
 
         print("✅ 仓库处理完成！")
