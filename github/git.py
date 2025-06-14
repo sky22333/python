@@ -18,7 +18,7 @@ GITHUB_TOKEN = "xxxxxxxxxxxxxxxxxxxxxxxxxxx"
 # 跳过处理的用户名列表（这些用户名的提交将保持不变）
 SKIP_AUTHORS = [
     "github-actions[bot]",
-    # 在此添加更多需要跳过的用户名
+    # 注意：此功能可能不起作用
 ]
 
 # 仓库列表文件，每行一个仓库地址（HTTPS或SSH）
