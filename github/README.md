@@ -9,6 +9,6 @@ apt install git-filter-repo git -y
 ```
 2：`repos.txt`文件中放入github仓库地址，一行一个。
 
-3：在`git.py`代码中添加`GitHub用户名和 Token变量`
+3：在`git.py`代码中添加`GitHub用户名和 Token变量`，Token需要有操作仓库的权限。
 
 4：然后执行`python git.py`

@@ -7,7 +7,7 @@ import subprocess
 import sys
 import tempfile
 
-# 配置：统一替换的用户名和邮箱
+# 配置：统一替换后的用户名和邮箱
 NEW_NAME = "NewName"
 NEW_EMAIL = "newemail@example.com"
 
