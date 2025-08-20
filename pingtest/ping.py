@@ -172,12 +172,96 @@ class AsyncSiteTester:
                 display_url = result.url.split("/https://raw.githubusercontent.com/")[0]
             print(f"{status} {display_url} 延迟: {latency_str}")
 
+    def cleanup_failed_sites(self, results: List[TestResult], filename: str, is_github: bool = False):
+        """清理测速失败的站点"""
+        if not os.path.exists(filename):
+            print(f"文件 {filename} 不存在，无法清理")
+            return
 
+        # 获取成功的站点URL集合
+        success_urls = set()
+        for result in results:
+            if result.success:
+                if is_github:
+                    if "/https://raw.githubusercontent.com/" in result.url:
+                        domain = result.url.split("/https://raw.githubusercontent.com/")[0]
+                        success_urls.add(domain)
+                else:
+                    success_urls.add(result.url)
+
+        with open(filename, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+
+        kept_lines = []
+        removed_count = 0
+        
+        for line in lines:
+            original_line = line.strip()
+            if not original_line or original_line.startswith("#"):
+                kept_lines.append(line)
+                continue
+                
+            if is_github:
+                domain = original_line
+                if not domain.startswith("http://") and not domain.startswith("https://"):
+                    domain = "https://" + domain
+                
+                if domain in success_urls:
+                    kept_lines.append(line)
+                else:
+                    removed_count += 1
+                    print(f"移除失败站点: {original_line}")
+            else:
+                url = self.normalize_url(original_line)
+                if url and url in success_urls:
+                    kept_lines.append(line)
+                else:
+                    removed_count += 1
+                    print(f"移除失败站点: {original_line}")
+
+        if removed_count > 0:
+            with open(filename, "w", encoding="utf-8") as f:
+                f.writelines(kept_lines)
+            print(f"已从 {filename} 中移除 {removed_count} 个失败站点")
+        else:
+            print(f"{filename} 中没有需要移除的失败站点")
+
+    def ask_cleanup(self, docker_results: Optional[List[TestResult]] = None, 
+                   github_results: Optional[List[TestResult]] = None):
+        """询问用户是否清理失败的站点"""
+        if not docker_results and not github_results:
+            return
+            
+        has_docker_failures = docker_results and any(not r.success for r in docker_results)
+        has_github_failures = github_results and any(not r.success for r in github_results)
+        
+        if not has_docker_failures and not has_github_failures:
+            print("\n所有站点测试都成功，无需清理")
+            return
+
+        print("\n" + "="*50)
+        response = input("是否移除测速失败的站点？(输入 y 确认，其他输入或回车取消): ").strip().lower()
+        
+        if response == 'y':
+            print("\n开始清理失败站点...")
+            
+            if has_docker_failures and docker_results:
+                self.cleanup_failed_sites(docker_results, "docker.txt", is_github=False)
+                
+            if has_github_failures and github_results:
+                self.cleanup_failed_sites(github_results, "github.txt", is_github=True)
+                
+            print("清理完成！")
+        else:
+            print("已取消清理操作")
 
     async def run_all_tests(self):
         """运行所有测试"""
         docker_sites = self.load_sites("docker.txt")
         github_urls = self.load_github_proxies("github.txt")
+        
+        docker_results = None
+        github_results = None
         
         if docker_sites:
             docker_results = await self.run_batch_tests(docker_sites, self.test_docker_registry)
@@ -190,6 +274,9 @@ class AsyncSiteTester:
             self.print_results(github_results, "GitHub Proxy")
         else:
             print("未找到 github.txt 或文件为空")
+        
+        # 询问是否清理失败的站点
+        self.ask_cleanup(docker_results, github_results)
 
 async def main():
     """主函数"""
